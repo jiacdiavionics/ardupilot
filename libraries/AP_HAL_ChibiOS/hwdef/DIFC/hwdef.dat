@@ -81,9 +81,10 @@ PB11 I2C2_SDA I2C2 PULLUP
 # UART Configuration (per user spec)
 # ============================================================
 
-# SERIAL_ORDER: USB first, then priority (per user spec: 6 USARTs + USB)
+# SERIAL_ORDER: USB first, then priority
 # NOTE: UART1 removed from SERIAL_ORDER due to PA10 conflict with VBUS
-SERIAL_ORDER OTG1 USART2 UART4 UART6 UART7 UART8
+# NOTE: UART6 removed due to PC6/PC7 AF issues on H743
+SERIAL_ORDER OTG1 USART2 UART4 UART7 UART8
 
 # UART2 - SBUS RC Input (per user spec)
 PD5 USART2_TX USART2
@@ -95,9 +96,9 @@ define DEFAULT_SERIAL2_PROTOCOL 23
 PB8 UART4_RX UART4
 PB9 UART4_TX UART4
 
-# UART6 - Available
-PC7 USART6_RX UART6
-PC6 USART6_TX UART6
+# UART6 - Available (using PA4 for RX - shared with MPU6500_CS)
+# NOTE: UART6 removed due to pin AF issues on H743
+# Use other UARTs instead: USART2, UART4, UART7, UART8
 
 # UART7 - Available
 PE7 UART7_RX UART7
