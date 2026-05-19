@@ -1,0 +1,250 @@
+# hw definition file for DIFC (STM32H743VIT6) flight controller
+# Production-ready hwdef following ArduPilot H7 conventions
+
+# MCU class and specific type
+MCU STM32H7xx STM32H743xx
+
+# board ID - OBTAIN UNIQUE ID FROM ARDUPILOT MAINTAINERS
+APJ_BOARD_ID AP_HW_DIFC
+
+# crystal frequency, 8MHz external oscillator
+OSCILLATOR_HZ 8000000
+
+FLASH_SIZE_KB 2048
+
+# bootloader takes first 384KB sector
+FLASH_RESERVE_START_KB 384
+
+define HAL_STORAGE_SIZE 32768
+STORAGE_FLASH_PAGE 14
+
+# ChibiOS system timer - TIM12 is standard for H7
+STM32_ST_USE_TIMER 12
+define CH_CFG_ST_RESOLUTION 16
+
+# ============================================================
+# USB OTG FS with VCP
+# ============================================================
+PA11 OTG_FS_DM OTG1
+PA12 OTG_FS_DP OTG1
+PA8 VBUS INPUT OPENDRAIN
+
+# SWD debug interface
+PA13 JTMS-SWDIO SWD
+PA14 JTCK-SWCLK SWD
+
+# ============================================================
+# SPI Bus Configuration (per user spec)
+# ============================================================
+
+# SPI4 - Primary IMU (ICM42688P) - User specified bus
+# NOTE: PE15 does NOT have SPI4 - remap to PD4 which has SPI4_NSS AF5
+PD4 ICM42688P_CS CS
+PE13 SPI4_MISO SPI4
+PE14 SPI4_MOSI SPI4
+PE12 SPI4_SCK SPI4
+
+# SPI1 - Secondary IMU (MPU6500) - User specified bus
+PA4 MPU6500_CS CS
+PA5 SPI1_SCK SPI1
+PA6 SPI1_MISO SPI1
+PA7 SPI1_MOSI SPI1
+
+# SPI2 - OSD (AT7456E) - User specified bus
+# PC3 is NOT SPI2_MOSI on H743 - remap to PB15
+PB12 MAX7456_CS CS
+PB14 SPI2_MISO SPI2
+PB15 SPI2_MOSI SPI2
+PD3 SPI2_SCK SPI2
+
+# SPI3 - Available for expansion
+PB3 SPI3_SCK SPI3
+PB4 SPI3_MISO SPI3
+PB5 SPI3_MOSI SPI3
+
+# ============================================================
+# I2C Bus Configuration (per user spec)
+# ============================================================
+
+# I2C order: I2C1 for compass, I2C2 for barometer (per user spec)
+I2C_ORDER I2C1 I2C2
+
+# I2C1 - Compass (QMC5883L) and external devices (per user spec)
+PB6 I2C1_SCL I2C1 PULLUP
+PB7 I2C1_SDA I2C1 PULLUP
+
+# I2C2 - Barometer (SPL06-001) (per user spec)
+PB10 I2C2_SCL I2C2 PULLUP
+PB11 I2C2_SDA I2C2 PULLUP
+
+# ============================================================
+# UART Configuration (per user spec)
+# ============================================================
+
+# SERIAL_ORDER: USB first, then priority (per user spec: 6 USARTs + USB)
+# NOTE: UART1 removed from SERIAL_ORDER due to PA10 conflict with VBUS
+SERIAL_ORDER OTG1 USART2 UART4 UART6 UART7 UART8
+
+# UART2 - SBUS RC Input (per user spec)
+PD5 USART2_TX USART2
+PD6 USART2_RX USART2
+# Use numeric protocol ID: 23 = RCIN_SBUS
+define DEFAULT_SERIAL2_PROTOCOL 23
+
+# UART4 - Available (GPS)
+PB8 UART4_RX UART4
+PB9 UART4_TX UART4
+
+# UART6 - Available
+PC7 USART6_RX UART6
+PC6 USART6_TX UART6
+
+# UART7 - Available
+PE7 UART7_RX UART7
+PE8 UART7_TX UART7
+
+# UART8 - Available
+PE0 UART8_RX UART8
+PE1 UART8_TX UART8
+
+# ============================================================
+# CAN Bus Configuration (per user spec)
+# ============================================================
+
+# CAN1 - Permanent 120 ohm termination onboard (per user spec)
+PD0 CAN1_RX CAN1
+PD1 CAN1_TX CAN1
+
+# ============================================================
+# SDMMC Configuration (native SDIO - per user spec)
+# ============================================================
+
+# SDMMC1 - SD Card (native SDIO, NOT SPI - per user spec)
+PC8 SDMMC1_D0 SDMMC1
+PC9 SDMMC1_D1 SDMMC1
+PC10 SDMMC1_D2 SDMMC1
+PC11 SDMMC1_D3 SDMMC1
+PC12 SDMMC1_CK SDMMC1
+PD2 SDMMC1_CMD SDMMC1
+
+# ============================================================
+# PWM Output Configuration
+# ============================================================
+# Timer/channel mapping for STM32H743 (per user spec):
+# PWM1-PWM2: TIM3 (BDShot capable)
+# PWM3-PWM6: TIM5 (NOT BDShot capable)
+# PWM7-PWM10: TIM4 (BDShot capable)
+# PWM11-PWM12: TIM15
+
+PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR
+PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51) BIDIR
+PA0  TIM5_CH1 TIM5 PWM(3) GPIO(52) BIDIR
+PA1  TIM5_CH2 TIM5 PWM(4) GPIO(53) BIDIR
+PA2  TIM5_CH3 TIM5 PWM(5) GPIO(54) BIDIR
+PA3  TIM5_CH4 TIM5 PWM(6) GPIO(55) BIDIR
+PD12 TIM4_CH1 TIM4 PWM(7) GPIO(56) BIDIR
+PD13 TIM4_CH2 TIM4 PWM(8) GPIO(57) BIDIR
+PD14 TIM4_CH3 TIM4 PWM(9) GPIO(58) BIDIR
+PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59) BIDIR
+PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60)
+PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61)
+
+# ============================================================
+# ADC Configuration - Battery Monitoring
+# ============================================================
+
+# Placeholder ADC config per common H7 pattern
+# TODO_UNRESOLVED: Verify pins from schematic for production
+# PC0 and PC1 are common choices for ADC on H7
+PC0 BATT_VOLTAGE_SENS ADC1 SCALE(1)
+PC1 BATT_CURRENT_SENS ADC1 SCALE(1)
+
+# STM32H7 ADC1 channel numbers: PC0=10, PC1=11
+define HAL_BATT_VOLT_PIN 10
+define HAL_BATT_CURR_PIN 11
+define HAL_BATT_VOLT_SCALE 11.0
+define HAL_BATT_CURR_SCALE 59.5
+define HAL_BATT_MONITOR_DEFAULT 4
+
+# ============================================================
+# Buzzer
+# ============================================================
+
+# PC13 is common for buzzer on H7 boards
+PC13 BUZZER OUTPUT GPIO(80) LOW
+define HAL_BUZZER_PIN 80
+
+# ============================================================
+# WS2812 LED Support
+# ============================================================
+
+# PA8 is common for WS2812 on H7 (TIM1_CH1)
+# TODO_UNRESOLVED: Verify if used on this board
+# PA8 TIM1_CH1 TIM1 PWM LED
+
+# ============================================================
+# IMU Configuration (per user spec)
+# ============================================================
+
+# SPI4 - ICM42688P (Primary IMU - FIXED: Using PD4 CS)
+SPIDEV icm42688p SPI4 DEVID1 ICM42688P_CS MODE3 2*MHZ 16*MHZ
+
+# SPI1 - MPU6500 (Secondary IMU - per user spec)
+SPIDEV mpu6500 SPI1 DEVID1 MPU6500_CS MODE3 1*MHZ 8*MHZ
+
+# IMU definitions (per user spec: ICM42688P primary, MPU6500 secondary)
+IMU Invensensev3 SPI:icm42688p ROTATION_NONE
+IMU Invensensev2 SPI:mpu6500 ROTATION_NONE
+
+define HAL_DEFAULT_INS_FAST_SAMPLE 1
+
+# DMA safety - prevent SPI1 and SPI4 from sharing DMA
+DMA_NOSHARE SPI1* SPI4*
+
+# ============================================================
+# Barometer Configuration (per user spec)
+# ============================================================
+
+# SPL06-001 on I2C2 (per user spec)
+BARO SPL06 I2C:1:0x76
+
+# ============================================================
+# Compass Configuration (per user spec)
+# ============================================================
+
+# QMC5883L on I2C1 (per user spec: ROTATION_NONE)
+COMPASS QMC5883L I2C:0:0x1E false ROTATION_NONE
+
+define AP_COMPASS_PROBING_ENABLED 1
+define ALLOW_ARM_NO_COMPASS
+
+# ============================================================
+# OSD Configuration (per user spec)
+# ============================================================
+
+# AT7456E on SPI2 (FIXED: PB15 MOSI)
+SPIDEV max7456 SPI2 DEVID4 MAX7456_CS MODE0 10*MHZ 10*MHZ
+
+define OSD_ENABLED 1
+define HAL_OSD_TYPE_DEFAULT 1
+ROMFS_WILDCARD libraries/AP_OSD/fonts/font*.bin
+
+# ============================================================
+# Feature Enablement
+# ============================================================
+
+define HAL_CAN_INTERFACE_ENABLED 1
+define HAL_STORAGE_ENABLED 1
+define HAL_LOGGING_ENABLED 1
+
+# ============================================================
+# DMA Priority Configuration
+# ============================================================
+
+DMA_PRIORITY SERIAL* SPI* SDMMC1*
+
+# ============================================================
+# Build Options
+# ============================================================
+
+env BUILD_ABIN True
