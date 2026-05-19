@@ -238,6 +238,9 @@ define HAL_CAN_INTERFACE_ENABLED 1
 define HAL_STORAGE_ENABLED 1
 define HAL_LOGGING_ENABLED 1
 
+# Disable bootloader flashing (no pre-built bootloader)
+define AP_BOOTLOADER_FLASHING_DISABLED 1
+
 # ============================================================
 # DMA Priority Configuration
 # ============================================================
