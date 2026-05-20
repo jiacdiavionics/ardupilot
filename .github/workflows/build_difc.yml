@@ -26,12 +26,13 @@ jobs:
 
       - name: Build DIFC firmware
         run: |
+          git config --global --add safe.directory /workspace
           docker run --rm -e GITHUB_WORKSPACE=/workspace \
             -v $GITHUB_WORKSPACE:/workspace \
             ardupilot/ardupilot-dev-chibios:v0.1.3 \
             bash -c "cd /workspace && \
               ./waf configure --board DIFC && \
-              ./waf ${{ github.inputs.vehicle }}"
+              ./waf ${{ inputs.vehicle }}"
 
       - name: Generate HEX file
         run: |
